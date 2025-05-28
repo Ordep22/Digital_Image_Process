@@ -64,6 +64,7 @@ def main():
     handle_image.show_image("Final image",handle_image.img)
     '''
 
+    '''
     handle_image = HandleImage()
     handle_image.read_image(PATH_82)
     #handle_image.show_image(r"Show first image", handle_image.img)
@@ -81,6 +82,28 @@ def main():
 
     handle_image.show_image(r"Thresh image", thresh_img)
     handle_image.show_image("Final image",handle_image.img)
+    '''
+    sigma  = 1.5
+    handle_image = HandleImage()
+    handle_image.read_image(PATH_114)
+    #handle_image.show_image(r"Show first image", handle_image.img)
+    blur_img  = cv.GaussianBlur(handle_image.img,(0,0),sigmaX=sigma,sigmaY=sigma)
+    handle_image.show_image(r"Blur image", blur_img)
+    thresh_img = cv.adaptiveThreshold(blur_img,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,cv.THRESH_BINARY,27,-22)
+
+
+    contours, _ = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+    min_area  = 10 #TODO: create a max and min value based on the found contours
+    filtered_contours = [cnt for cnt in contours if cv.contourArea(cnt) > min_area]
+
+    object_count  = len(filtered_contours)
+    cv.drawContours(handle_image.img,filtered_contours,-1,(0,100,0),1)
+    cv.putText(handle_image.img, f"Object:{object_count}", (10,30), cv.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
+
+    handle_image.show_image(r"Thresh image", thresh_img)
+    handle_image.show_image("Final image",handle_image.img)
+
 
 
 if __name__ == "__main__":
