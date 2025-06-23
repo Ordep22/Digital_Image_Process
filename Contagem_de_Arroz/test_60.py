@@ -9,21 +9,33 @@ def contar_graos_watershed(image_path, min_area=100, max_area=1000, debug=False)
     blur = cv.GaussianBlur(gray, (9, 9), 0)
     thresh = cv.adaptiveThreshold(blur, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
                                    cv.THRESH_BINARY_INV, 31, 5)
-
+    cv.imshow("Result", thresh)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     # Remover ruído com abertura morfológica
     kernel = np.ones((1, 1), np.uint8)
     opening = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel, iterations=1)
-
+    cv.imshow("Opening", opening)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     # Background seguro
     kernel = np.ones((2, 2), np.uint8)
     sure_bg = cv.dilate(opening, kernel, iterations=1)
-
+    cv.imshow("sure_bg", sure_bg)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     # Distância para separar grãos
     dist_transform = cv.distanceTransform(opening, cv.DIST_L2, 5)
+    cv.imshow("dist_transform", dist_transform)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
     _, sure_fg = cv.threshold(dist_transform, 0.05 * dist_transform.max(), 255, 0)
+    cv.imshow("sure_fg", sure_fg)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     # Marcação
     sure_fg = np.uint8(sure_fg)
@@ -36,7 +48,9 @@ def contar_graos_watershed(image_path, min_area=100, max_area=1000, debug=False)
     markers = cv.watershed(image, markers)
     result = image.copy()
     result[markers == -1] = [0, 0, 255]  # contorno vermelho opcional
-
+    cv.imshow("Result", result)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     # Encontrar contornos nos marcadores segmentados
     mask = np.uint8(markers > 1) * 255
@@ -57,6 +71,6 @@ def contar_graos_watershed(image_path, min_area=100, max_area=1000, debug=False)
     return len(valid)
 
 # Exemplo de uso
-image_path = r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Contagem_de_Arroz\Image\60.bmp"
+image_path = r"C:\Work\PyProjects\Teste\60.bmp"
 total = contar_graos_watershed(image_path, debug=True)
 print(f"Total de grãos detectados: {total}")
