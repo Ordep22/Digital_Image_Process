@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-
+DIR_PATH = r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\Result\\"
 PATHS = [
     r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\0.bmp",
     r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\1.bmp",
@@ -10,9 +10,9 @@ PATHS = [
     r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\5.bmp",
     r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\6.bmp",
     r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\7.bmp",
-    r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\8.bmp",
-    r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\9.png"
+    r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\8.bmp"
 ]
+PATH_NEW_BACKGROUND = [r"C:\Users\Pedro Pereira\Documents\Git\Digital_Image_Process\Chroma Key Segmentation\img\9.png"]
 
 class ImageProcess:
     def __init__(self):
@@ -25,6 +25,10 @@ class ImageProcess:
         cv.imshow(title_window, img)
         cv.waitKey(0)
         cv.destroyAllWindows()
+
+    def save_image(self, img, title):
+        img = (img).astype(np.uint8)
+        cv.imwrite(DIR_PATH + title + ".png", img)
 
     def extract_foreground(self, img, debug=True):
         img_blurred = cv.blur(img, ksize=(5, 5))
@@ -106,14 +110,13 @@ class ImageProcess:
 
 
 def main():
-    index = 5
     process = ImageProcess()
-    new_background = process.read_image(PATHS[9])
 
-    print(f"Processando imagem {index}")
-    img = process.read_image(PATHS[index])
-    foreground, alpha = process.extract_foreground(img, debug=True)
-    process.assble_new_image(foreground, alpha, new_background, debug=True)
-
+    for path in PATHS[:-1]:
+        print(f"Processando imagem {path[len(path)-5:]}")
+        img = process.read_image(path)
+        foreground, alpha = process.extract_foreground(img, debug=True)
+        new_image  = process.assble_new_image(foreground, alpha, PATH_NEW_BACKGROUND, debug=True)
+        process.save_image(new_image,title = "result_image_" + path[len(path)-5:] )
 if __name__ == "__main__":
     main()
